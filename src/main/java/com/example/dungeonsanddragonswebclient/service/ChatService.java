@@ -1,37 +1,39 @@
 package com.example.dungeonsanddragonswebclient.service;
 
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 @Service
 public class ChatService {
 
-    private List<String> messages;
+    private final String API_URL = "https://api.mistral.ai/generate";  // URL for Mistral API
+    private final String API_KEY = "api.key"; // Din API-nøgle her
 
-    public ChatService() {
-        // Initialiserer chatbeskederne
-        messages = new ArrayList<>();
-        messages.add("🤖 Dungeon Master: Welcome to your adventure! What will you do?");
-    }
+    public String generateAdventureScenario(String prompt) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + API_KEY);
 
-    // Hent initiale beskeder
-    public List<String> getInitialMessages() {
-        return messages;
-    }
+            String body = "{\"prompt\": \"" + prompt + "\", \"max_tokens\": 150}";
+            HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-    // Tilføj en besked til listen og returner ny liste
-    public void addMessage(String message) {
-        messages.add(message);
-    }
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
-    // Simuler chatbot-svar
-    public String getResponse(String userInput) {
-        if (userInput.toLowerCase().contains("roll")) {
-            return "🎲 Rolling dice...";
-        } else {
-            return "🧙 Dungeon Master: I didn't understand that, try again!";
+            return response.getBody(); // For simplicity, return hele svaret.
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Der opstod en fejl i eventyret. Prøv igen.";
         }
+    }
+
+    public int rollDice() {
+        return (int) (Math.random() * 20) + 1;  // Rul en D20
     }
 }

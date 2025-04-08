@@ -1,32 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D&D Dice Chat</title>
-    <link rel="stylesheet" href="/dndCSS.css">
+    <title>DnD Adventure with Mistral Bot</title>
+    <link rel="stylesheet" href="dndCSS.css">
 </head>
 <body>
-
-<div class="chat-container">
-    <div class="chat-box" id="chatBox">
-        <!-- Vis chatbeskeder dynamisk -->
-        <div th:each="message : ${chatMessages}">
-            <p th:text="${message}"></p>
-        </div>
-    </div>
-
-    <form action="/sendMessage" method="post">
-        <input type="text" name="userInput" placeholder="Type your action..." required>
-        <button type="submit">Send</button>
-    </form>
-
-    <form action="/rollDice" method="post">
-        <button type="submit">🎲 Roll d20</button>
-    </form>
+<div id="game-container">
+    <div id="game-log"></div>
+    <input type="text" id="user-input" placeholder="Hvad vil du gøre?" />
+    <button class="button" onclick="sendMessage()">Send</button>
+    <button class="button" onclick="rollDice()">Rul Terning</button>
 </div>
-
-<script src="/templates/dndScript.js"></script>
-
+<script src="dndScript.js"></script>
 </body>
 </html>

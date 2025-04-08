@@ -1,57 +1,32 @@
-const chatBox = document.getElementById("chatBox");
+async function sendMessage() {
+    const userInput = document.getElementById('user-input').value;
 
-function appendMessage(sender, text) {
-    const p = document.createElement("p");
-    p.innerHTML = `<strong>${sender}:</strong> ${text}`;
-    chatBox.appendChild(p);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    if (userInput.trim() !== '') {
+        // Send brugerens input til backend for at få et eventyr
+        const response = await fetch('/chat/adventure', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userMessage: userInput })
+        });
+
+        const data = await response.json();
+        const gameLog = document.getElementById('game-log');
+        gameLog.textContent += "\n🤖 Dungeon Master: " + data.message;
+        document.getElementById('user-input').value = '';
+    }
 }
 
-function sendMessage() {
-    const input = document.getElementById("userInput");
-    const text = input.value.trim();
-    if (!text) return;
-
-    appendMessage("🧝 You", text);
-    input.value = "";
-
-    // Send user input to Spring Boot backend and get the response from DM
-    fetch('/api/chat/message', {
+async function rollDice() {
+    const response = await fetch('/chat/roll-dice', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(text)
-    })
-        .then(response => response.json())
-        .then(data => {
-            appendMessage("🧙 DM", data); // Append DM's response to the chatbox
-        })
-        .catch(error => {
-            console.error("Error fetching chat response:", error);
-            appendMessage("🧙 DM", "Sorry, there was an error processing your request.");
-        });
-}
+            'Content-Type': 'application/json'
+        }
+    });
 
-function rollDice() {
-    const roll = Math.floor(Math.random() * 20) + 1;
-    appendMessage("🎲 Dice", `You rolled a ${roll}`);
-
-    let dmResponse = "";
-
-    if (roll === 20) {
-        dmResponse = "✨ Critical success! You impress everyone and earn a bag of gold!";
-    } else if (roll === 1) {
-        dmResponse = "💀 Critical fail! You fall flat on your face and someone calls their goons to beat you up.";
-    } else if (roll >= 15) {
-        dmResponse = "⚔️ Great success! Your move goes well.";
-    } else if (roll >= 10) {
-        dmResponse = "😐 Mixed result. It kind of works... but there's a complication.";
-    } else {
-        dmResponse = "😬 Not great. Your move fails awkwardly.";
-    }
-
-    setTimeout(() => {
-        appendMessage("🧙 DM", dmResponse);
-    }, 700);
+    const data = await response.json();
+    const gameLog = document.getElementById('game-log');
+    gameLog.textContent += "\n🎲 Du rullede en: " + data.message;
 }
