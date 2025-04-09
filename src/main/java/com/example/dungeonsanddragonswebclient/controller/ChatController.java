@@ -1,4 +1,4 @@
-package com.example.dungeonsanddragonswebclient;
+package com.example.dungeonsanddragonswebclient.controller;
 
 import com.example.dungeonsanddragonswebclient.model.ChatRequest;
 import com.example.dungeonsanddragonswebclient.model.ChatResponse;

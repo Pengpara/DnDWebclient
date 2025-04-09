@@ -1,4 +1,4 @@
-package com.example.dungeonsanddragonswebclient;
+package com.example.dungeonsanddragonswebclient.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
