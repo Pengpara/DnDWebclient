@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DnD Adventure</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/dndCSS.css">
+    <title>Adventure Game</title>
 </head>
 <body>
 <div id="game-container">
     <div id="game-log"></div>
-    <input type="text" id="user-input" placeholder="Hvad vil du gøre?">
-    <div id="options-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    <button class="button" onclick="sendMessage()">Send</button>
-    <button class="button" onclick="rollDice()">Rul Terning</button>
+    <input type="text" id="user-input" placeholder="Enter your choice">
+    <button id="send-button">Send</button>
+    <div id="options-container"></div>
 </div>
+
 <script src="/dndScript.js"></script>
 </body>
+
 </html>

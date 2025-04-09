@@ -1,4 +1,4 @@
-/* --------- Global Style --------- */
+/* ========== Global Styles ========== */
 body {
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@ body {
     height: 100vh;
 }
 
-/* --------- Game Container --------- */
+/* ========== Game Container ========== */
 #game-container {
     background-color: #2b2b2b;
     padding: 30px;
@@ -23,7 +23,7 @@ body {
     gap: 20px;
 }
 
-/* --------- Game Log --------- */
+/* ========== Game Log ========== */
 #game-log {
     background-color: #1c1c1c;
     border: 1px solid #444;
@@ -38,7 +38,6 @@ body {
     scrollbar-width: thin;
 }
 
-/* Scrollbar style */
 #game-log::-webkit-scrollbar {
     width: 8px;
 }
@@ -48,7 +47,15 @@ body {
     border-radius: 4px;
 }
 
-/* --------- Input + Button --------- */
+#game-log div {
+    margin-bottom: 10px;
+}
+
+#game-log strong {
+    color: #ffdd57;
+}
+
+/* ========== Input Area ========== */
 #user-input {
     padding: 12px 15px;
     font-size: 1.1rem;
@@ -61,6 +68,7 @@ body {
     box-shadow: 0 0 5px #000 inset;
 }
 
+/* ========== Button Style ========== */
 button {
     background: linear-gradient(145deg, #3b8132, #276122);
     color: white;
@@ -79,29 +87,11 @@ button:hover {
     box-shadow: 0 0 20px #28a74580;
 }
 
-/* --------- Dialogue style --------- */
-#game-log div {
-    margin-bottom: 10px;
+/* ========== Options Container ========== */
+#options-container {
+    display: none;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
 }
-
-#game-log strong {
-    color: #ffdd57;
-}
-
-#options-container button {
-    background: linear-gradient(145deg, #444, #222);
-    border: 1px solid #555;
-    border-radius: 6px;
-    padding: 10px 16px;
-    color: #fff;
-    cursor: pointer;
-    font-family: 'Georgia', serif;
-    font-size: 1rem;
-    transition: background 0.2s, transform 0.2s;
-}
-
-#options-container button:hover {
-    background: linear-gradient(145deg, #555, #333);
-    transform: scale(1.05);
-}
-
