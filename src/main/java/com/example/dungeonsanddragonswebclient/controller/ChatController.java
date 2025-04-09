@@ -20,14 +20,16 @@ public class ChatController {
 
     @PostMapping("/adventure")
     public ResponseEntity<ChatResponse> startAdventure(@RequestBody ChatRequest chatRequest) {
-        String scenario = chatService.generateAdventureScenario(chatRequest.getUserMessage());
+        // Extract the user message from the first Message object in the list
+        String userMessage = chatRequest.getMessages().get(0).getContent(); // Get the content of the first message
+        String scenario = chatService.generateAdventureScenario(userMessage);
         return new ResponseEntity<>(new ChatResponse(scenario), HttpStatus.OK);
     }
 
     @PostMapping("/roll-dice")
     public ResponseEntity<ChatResponse> rollDice() {
         int rollResult = chatService.rollDice();
-        String rollMessage = "🎲 Du rullede en: " + rollResult;
+        String rollMessage = "🎲 You rolled: " + rollResult;
         return new ResponseEntity<>(new ChatResponse(rollMessage), HttpStatus.OK);
     }
 }

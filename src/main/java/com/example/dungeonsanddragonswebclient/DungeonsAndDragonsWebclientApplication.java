@@ -1,11 +1,10 @@
 package com.example.dungeonsanddragonswebclient;
 
+import com.example.dungeonsanddragonswebclient.service.ChatService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +13,14 @@ import java.util.Scanner;
 @SpringBootApplication
 public class DungeonsAndDragonsWebclientApplication implements CommandLineRunner {
 
-    @Value("${api.key}")  // Din API-nøgle bliver injiceret fra application.properties
+    @Value("${api.key}")  // API key injected from application.properties
     private String key;
+
+    private final ChatService chatService;
+
+    public DungeonsAndDragonsWebclientApplication(ChatService chatService) {
+        this.chatService = chatService;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(DungeonsAndDragonsWebclientApplication.class, args);
@@ -24,37 +29,24 @@ public class DungeonsAndDragonsWebclientApplication implements CommandLineRunner
     @Override
     public void run(String... args) {
         Scanner scanner = new Scanner(System.in);
-        WebClient webClient = WebClient.create("https://api.mistral.ai");
 
-        // Startprompten til eventyret
-        List<ChatRequest.Message> messages = new ArrayList<>();
-        messages.add(new ChatRequest.Message("system", "You are a creative and engaging Dungeon Master for a Dungeons & Dragons adventure. Set the scene and respond to the player's actions."));
-        messages.add(new ChatRequest.Message("user", "Start an exciting adventure. End with: 'What do you want to do next?'"));
+        // Start the adventure with an initial user input
+        System.out.println("Welcome to the Dungeons & Dragons adventure!");
+        System.out.print("Enter your action to begin the adventure: ");
+        String userInput = scanner.nextLine().trim();
 
+        // Generate the adventure scenario based on the user's action
+        String adventureScenario = chatService.generateAdventureScenario(userInput);
+
+        // Output the AI-generated scenario
+        System.out.println("\n🤖 Dungeon Master:");
+        System.out.println(adventureScenario);
+
+        // Adventure loop
         boolean keepPlaying = true;
-
         while (keepPlaying) {
-            // Bygger en ChatRequest og sender den til Mistral
-            ChatRequest request = new ChatRequest("mistral-medium", messages, 0.9, 1.0);
-
-            String responseContent = webClient.post()
-                    .uri("/v1/chat/completions")
-                    .header("Authorization", "Bearer " + key)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(request)
-                    .retrieve()
-                    .bodyToMono(ChatResponse.class)
-                    .map(response -> response.getChoices().get(0).getMessage().getContent())
-                    .block();
-
-            System.out.println("\n🤖 Dungeon Master:");
-            System.out.println(responseContent);
-
-            messages.add(new ChatRequest.Message("assistant", responseContent));
-
-            // Brugerens input
             System.out.print("\n🧝 Your move ('exit' to quit): ");
-            String userInput = scanner.nextLine().trim();
+            userInput = scanner.nextLine().trim();
 
             if (userInput.equalsIgnoreCase("exit")) {
                 keepPlaying = false;
@@ -62,7 +54,12 @@ public class DungeonsAndDragonsWebclientApplication implements CommandLineRunner
             } else if (userInput.toLowerCase().startsWith("roll")) {
                 handleDiceRoll(userInput);
             } else {
-                messages.add(new ChatRequest.Message("user", userInput));
+                // Generate new scenario based on the user's new action
+                String newScenario = chatService.generateAdventureScenario(userInput);
+
+                // Output the new AI-generated scenario
+                System.out.println("\n🤖 Dungeon Master:");
+                System.out.println(newScenario);
             }
         }
     }
@@ -96,7 +93,7 @@ public class DungeonsAndDragonsWebclientApplication implements CommandLineRunner
                 return;
             }
 
-            // Håndterer flere terningkast
+            // Handle multiple dice rolls
             List<Integer> rolls = new ArrayList<>();
             int total = 0;
             for (int i = 0; i < count; i++) {
@@ -105,7 +102,7 @@ public class DungeonsAndDragonsWebclientApplication implements CommandLineRunner
                 total += roll;
             }
 
-            // Beskriver resultatet af terningkastet
+            // Describe the result of the dice roll
             String rollDescription = getRollDescription(total);
 
             System.out.println("🎲 You rolled " + count + "d" + sides + ": " + rolls + " = Total: " + total);
@@ -116,7 +113,7 @@ public class DungeonsAndDragonsWebclientApplication implements CommandLineRunner
         }
     }
 
-    // Funktion til at bestemme beskrivelsen af terningkastet
+    // Function to determine the description of the dice roll
     private String getRollDescription(int rollTotal) {
         if (rollTotal == 20) {
             return "✨ Critical Success: Unbelievable! You're a legend. Riches rain on you.";
@@ -139,3 +136,4 @@ public class DungeonsAndDragonsWebclientApplication implements CommandLineRunner
         }
         return "⚖️ Unknown Roll: Something strange occurred!";
     }
+}
