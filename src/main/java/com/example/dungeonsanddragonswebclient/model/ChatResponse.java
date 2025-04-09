@@ -3,6 +3,8 @@ package com.example.dungeonsanddragonswebclient.model;
 public class ChatResponse {
     private String message;
 
+    public ChatResponse() {}
+
     public ChatResponse(String message) {
         this.message = message;
     }

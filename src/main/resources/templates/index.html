@@ -2,17 +2,17 @@
 <html lang="da">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DnD Adventure with Mistral Bot</title>
-    <link rel="stylesheet" href="dndCSS.css">
+    <title>DnD Adventure</title>
+    <link rel="stylesheet" href="/dndCSS.css">
 </head>
 <body>
 <div id="game-container">
     <div id="game-log"></div>
-    <input type="text" id="user-input" placeholder="Hvad vil du gøre?" />
+    <input type="text" id="user-input" placeholder="Hvad vil du gøre?">
+    <div id="options-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
     <button class="button" onclick="sendMessage()">Send</button>
     <button class="button" onclick="rollDice()">Rul Terning</button>
 </div>
-<script src="dndScript.js"></script>
+<script src="/dndScript.js"></script>
 </body>
 </html>

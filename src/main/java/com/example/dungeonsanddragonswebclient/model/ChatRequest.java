@@ -1,8 +1,7 @@
 package com.example.dungeonsanddragonswebclient.model;
 
 public class ChatRequest {
-
-    private String userMessage;  // Brugerens besked, der sendes til chatbotten
+    private String userMessage;
 
     public ChatRequest() {}
 
@@ -16,12 +15,5 @@ public class ChatRequest {
 
     public void setUserMessage(String userMessage) {
         this.userMessage = userMessage;
-    }
-
-    @Override
-    public String toString() {
-        return "ChatRequest{" +
-                "userMessage='" + userMessage + '\'' +
-                '}';
     }
 }

@@ -1,82 +1,107 @@
-/* Generelle stilarter for kroppen og baggrunden */
+/* --------- Global Style --------- */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #222;
-    color: #e0e0e0;
     margin: 0;
     padding: 0;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(to bottom right, #1a1a1a, #2e2e2e);
+    color: #e5e5e5;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    text-align: center;
 }
 
-/* Baggrundscontainer for selve spillet */
+/* --------- Game Container --------- */
 #game-container {
-    background-color: #333;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 800px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    background-color: #2b2b2b;
+    padding: 30px;
+    border-radius: 16px;
+    width: 700px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    position: relative;
+    gap: 20px;
 }
 
-/* Spil-loggen hvor eventyr og handlinger bliver vist */
+/* --------- Game Log --------- */
 #game-log {
-    background-color: #444;
-    color: #fff;
-    width: 100%;
-    height: 300px;
-    overflow-y: scroll;
-    padding: 10px;
+    background-color: #1c1c1c;
+    border: 1px solid #444;
+    padding: 20px;
     border-radius: 10px;
-    margin-bottom: 20px;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1.1rem;
-    line-height: 1.5;
+    height: 350px;
+    overflow-y: auto;
+    font-size: 1rem;
+    line-height: 1.6;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
     white-space: pre-wrap;
-    word-wrap: break-word;
-    text-align: left;
+    scrollbar-width: thin;
 }
 
-/* Stilen for inputfeltet */
+/* Scrollbar style */
+#game-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+#game-log::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+/* --------- Input + Button --------- */
 #user-input {
-    background-color: #555;
-    border: 1px solid #777;
-    color: #fff;
-    font-size: 1.2rem;
-    padding: 10px;
-    width: 80%;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-/* Knappenes stil */
-.button {
-    background-color: #28a745;
-    color: white;
-    padding: 12px 24px;
-    font-size: 1.2rem;
+    padding: 12px 15px;
+    font-size: 1.1rem;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 10px;
-    transition: background-color 0.3s ease;
+    border-radius: 8px;
+    background-color: #333;
+    color: #fff;
+    outline: none;
+    width: 100%;
+    box-shadow: 0 0 5px #000 inset;
 }
 
-/* Når man hover over knapperne */
-.button:hover {
-    background-color: #218838;
-}
-
-/* Stilen for den første besked i eventyret */
-#game-log:empty::before {
-    content: "🤖 Dungeon Master: Velkommen til dit eventyr! Hvad vil du gøre?";
-    color: #ffeb3b;
+button {
+    background: linear-gradient(145deg, #3b8132, #276122);
+    color: white;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
     font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #28a74580;
+}
+
+/* --------- Dialogue style --------- */
+#game-log div {
+    margin-bottom: 10px;
+}
+
+#game-log strong {
+    color: #ffdd57;
+}
+
+#options-container button {
+    background: linear-gradient(145deg, #444, #222);
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 10px 16px;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+#options-container button:hover {
+    background: linear-gradient(145deg, #555, #333);
+    transform: scale(1.05);
+}
+
