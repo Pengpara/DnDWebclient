@@ -24,8 +24,7 @@ public class ChatController {
 
     @PostMapping("/adventure")
     public ChatResponse getAdventureResponse(@RequestBody ChatRequest chatRequest) {
-        String botReply = chatService.generateAdventureScenario(chatRequest.getUserMessage());
-        return new ChatResponse(botReply);
+        return chatService.generateAdventureScenario(chatRequest.getUserMessage());
     }
 
 
@@ -33,9 +32,14 @@ public class ChatController {
     @ResponseBody
     public ResponseEntity<Map<String, String>> getAdventureResponse(@RequestBody Map<String, String> request) {
         String prompt = request.get("prompt");
-        String response = chatService.generateAdventureScenario(prompt);
+        ChatResponse chatResponse = chatService.generateAdventureScenario(prompt);
+
         Map<String, String> responseMap = new HashMap<>();
-        responseMap.put("response", response);
+        responseMap.put("response", chatResponse.getMessage());
+        responseMap.put("diceRoll", String.valueOf(chatResponse.getDiceRoll()));
+        responseMap.put("diceResult", chatResponse.getDiceResult());
+
         return ResponseEntity.ok(responseMap);
     }
 }
+
