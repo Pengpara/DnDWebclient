@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+//fed ko
 @RestController
 @RequestMapping("/chat")
 @CrossOrigin(origins = "*")  // 🟢 Tillad frontend at tale med backend
