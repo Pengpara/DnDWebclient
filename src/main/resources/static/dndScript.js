@@ -2,34 +2,52 @@ let characterCreated = false;
 let characterInfo = {};
 let currentChoices = [];
 
-function appendToGameLog(text, isDM = false) {
+async function appendToGameLog(text, isDM = false, useTyping = true) {
     const log = document.getElementById('game-log');
     const div = document.createElement("div");
     div.className = isDM ? 'dm-line' : 'chat-line';
     log.appendChild(div);
 
-    typeWriterEffect(text, div, 20);
+    if (useTyping) {
+        await typeWriterEffect(text, div, 20);
+    } else {
+        div.innerHTML = text.replace(/\n/g, "<br>");
+        log.scrollTo({
+            top: log.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
 }
 
 function typeWriterEffect(text, element, delay = 20) {
-    let i = 0;
-    function type() {
-        if (i < text.length) {
-            const char = text.charAt(i);
-            element.innerHTML += char === "\n" ? "<br>" : char;
-            i++;
+    return new Promise(resolve => {
+        let i = 0;
 
-            // Keep auto-scrolling as text types
-            const log = document.getElementById('game-log');
-            log.scrollTo({
-                top: log.scrollHeight,
-                behavior: 'smooth'
-            });
+        function type() {
+            if (i < text.length) {
+                const char = text.charAt(i);
+                element.innerHTML += char === "\n" ? "<br>" : char;
+                i++;
 
-            setTimeout(type, delay);
+                const log = document.getElementById('game-log');
+
+                // 🔽 Kun scroll hvis brugeren er tæt på bunden (fx mindre end 100px fra)
+                const isAtBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 100;
+                if (isAtBottom) {
+                    log.scrollTo({
+                        top: log.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+
+                setTimeout(type, delay);
+            } else {
+                resolve();
+            }
         }
-    }
-    type();
+
+        type();
+    });
 }
 
 function showThinking() {
@@ -114,7 +132,7 @@ async function startAdventure() {
             .filter(line => !/^\d+\.\s/.test(line))
             .join('\n');
 
-        appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
+        await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
 
         const choices = extractChoicesFromMessage(data.message);
 
@@ -136,19 +154,28 @@ function extractChoicesFromMessage(message) {
 
 function updateOptionsFromResponse(choices) {
     const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = '';
+    optionsContainer.innerHTML = ''; // Fjern gamle valgmuligheder
 
+    // Tilføj nye valgmuligheder (og deaktivér gamle knapper, hvis du ønsker det)
     choices.forEach((choice, index) => {
         const button = document.createElement('button');
         button.classList.add('button');
         button.textContent = `${index + 1}. ${choice.text}`;
         button.onclick = () => handleUserChoice(index + 1, choice.text);
+
+        // Deaktiver knapperne, der er valgt tidligere
+        button.disabled = false; // Hvis du ønsker at deaktivere, kan du gøre det her
         optionsContainer.appendChild(button);
     });
 }
 
 async function handleUserChoice(choiceIndex, choiceText) {
-    appendToGameLog(`🧝 ${choiceText}`);
+    // Vis valget og fjern derefter options
+    await appendToGameLog(`🧝 ${choiceText}`, false, false);
+
+    // Fjern valgmulighederne (deaktiver knapper)
+    const optionsContainer = document.getElementById('options-container');
+    optionsContainer.innerHTML = ''; // Fjern alle knapper
 
     showThinking();
     const response = await fetch('http://localhost:8080/chat/adventure', {
@@ -160,14 +187,12 @@ async function handleUserChoice(choiceIndex, choiceText) {
 
     if (response.ok) {
         const data = await response.json();
-        // Remove lines like "1. 2. 3. etc."
         const cleanedMessage = data.message
             .split('\n')
             .filter(line => !/^\d+\.\s/.test(line))
             .join('\n');
 
-        appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
-
+        await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true); // 🧙‍♂️ skal have typewriter-effekt
         const choices = extractChoicesFromMessage(data.message);
         currentChoices = choices;
         updateOptionsFromResponse(choices);
