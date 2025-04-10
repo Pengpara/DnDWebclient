@@ -173,7 +173,7 @@ async function startAdventure() {
             .filter(line => !/^\d+\.\s/.test(line))
             .join('\n');
 
-        appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
+        await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
 
         const choices = extractChoicesFromMessage(data.message);
 
@@ -206,14 +206,17 @@ function updateOptionsFromResponse(choices) {
         button.textContent = `${index + 1}. ${choice.text}`;
         button.onclick = () => handleUserChoice(index + 1, choice.text);
 
+        // Deaktiver knapperne, der er valgt tidligere
         button.disabled = false; // Hvis du ønsker at deaktivere, kan du gøre det her
         optionsContainer.appendChild(button);
     });
 }
 
 async function handleUserChoice(choiceIndex, choiceText) {
+    // Vis valget og fjern derefter options
     await appendToGameLog(`🧝 ${choiceText}`, false, false);
 
+    // Fjern valgmulighederne (deaktiver knapper)
     const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = ''; // Fjern alle knapper
 
@@ -227,14 +230,12 @@ async function handleUserChoice(choiceIndex, choiceText) {
 
     if (response.ok) {
         const data = await response.json();
-        // Remove lines like "1. 2. 3. etc."
         const cleanedMessage = data.message
             .split('\n')
             .filter(line => !/^\d+\.\s/.test(line))
             .join('\n');
 
-        appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
-
+        await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true); // 🧙‍♂️ skal have typewriter-effekt
         const choices = extractChoicesFromMessage(data.message);
         currentChoices = choices;
         updateOptionsFromResponse(choices);
