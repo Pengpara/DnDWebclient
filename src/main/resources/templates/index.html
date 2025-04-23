@@ -9,8 +9,11 @@
     <style>
         body {
             font-family: 'Press Start 2P', cursive;
-            background: url('/cave.gif') no-repeat center center fixed;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
             background-size: cover;
+            background-color: #000;
             color: #e0d6b8;
         }
 
@@ -164,10 +167,42 @@
             66%  { content: '..'; }
             100% { content: '...'; }
         }
+        /* Base filter transition */
+        body {
+            transition: filter 2s ease-in-out;
+        }
+
+        /* Fade everything to black */
+        body.fade-to-black {
+            filter: brightness(0);
+        }
+
+        /* Fade everything back to normal */
+        body.fade-to-normal {
+            filter: brightness(1);
+        }
+
+        #background-layer {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 1;
+            transition: opacity 2s ease-in-out;
+        }
+
+        /* Fading class */
+        #background-layer.fade-out {
+            opacity: 0;
+        }
+
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 relative">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
+<!-- 🔹 Background layer for fade effect -->
+<div id="background-layer" class="absolute inset-0 -z-10" style="background-image: url('/cave.gif');"></div>
+
+<!-- 🔸 Chat UI -->
 <div class="w-full max-w-4xl relative pixel-border bg-[#1e1e1e]/80 p-4 space-y-4">
     <div class="text-center mb-2">
         <h1 class="text-lg">D&D Chat Adventure</h1>

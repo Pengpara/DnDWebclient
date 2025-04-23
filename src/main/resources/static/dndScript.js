@@ -1,6 +1,7 @@
 let characterCreated = false;
 let characterInfo = {};
 let currentChoices = [];
+let currentBackground = 'cave'; // Default initial background
 
 const dmThinkingLines = [
     "The DM strokes his long, silver beard, eyes flickering like candlelight in deep thought",
@@ -166,8 +167,14 @@ async function startAdventure() {
     });
     removeThinking();
 
+
+
     if (response.ok) {
         const data = await response.json();
+        console.log("✅ Received message:", data.message); // <-- ADD THIS
+
+        updateBackgroundFromMessage(data.message);
+
         const cleanedMessage = data.message
             .split('\n')
             .filter(line => !/^\d+\.\s/.test(line))
@@ -212,6 +219,51 @@ function updateOptionsFromResponse(choices) {
     });
 }
 
+function updateBackgroundFromMessage(message) {
+    const trimmed = message.trim();
+    const match = trimmed.match(/#(tavern|castle|cave|alley|forest)\b/i);
+    if (!match) {
+        console.log("🚫 No valid background tag found.");
+        return;
+    }
+
+    const scene = match[1].toLowerCase();
+
+    // 👉 Check if the scene is already the current one
+    if (scene === currentBackground) {
+        console.log(`🛑 Background already set to "${scene}", skipping transition.`);
+        return;
+    }
+
+    currentBackground = scene; // Update the current scene
+
+    const newBg = `url('/${scene}.gif')`;
+    const fadeTime = 2000;
+    const pauseBetween = 1000;
+    const bgEl = document.getElementById("background-layer");
+
+    console.log("🔹 Step 1: Start fade out");
+    bgEl.classList.add("fade-out");
+
+    setTimeout(() => {
+        console.log("🔹 Step 2: Switch image");
+        bgEl.style.backgroundImage = newBg;
+
+        setTimeout(() => {
+            console.log("🔹 Step 3: Fade back in");
+            bgEl.classList.remove("fade-out");
+
+            setTimeout(() => {
+                console.log("✅ Step 4: Done!");
+            }, fadeTime);
+
+        }, pauseBetween);
+
+    }, fadeTime);
+}
+
+
+
 async function handleUserChoice(choiceIndex, choiceText) {
     // Vis valget og fjern derefter options
     await appendToGameLog(`🧝 ${choiceText}`, false, false);
@@ -228,8 +280,13 @@ async function handleUserChoice(choiceIndex, choiceText) {
     });
     removeThinking();
 
+
     if (response.ok) {
         const data = await response.json();
+        console.log("✅ Received message:", data.message); // <-- ADD THIS
+
+        updateBackgroundFromMessage(data.message);
+
         const cleanedMessage = data.message
             .split('\n')
             .filter(line => !/^\d+\.\s/.test(line))
@@ -245,6 +302,7 @@ async function handleUserChoice(choiceIndex, choiceText) {
 }
 
 window.addEventListener('load', () => {
+    console.log("🧪 JS is running");
     appendToGameLog("🧙‍♂️ Ohh, hello traveller! Let’s begin thy journey...", true);
     createCharacter();
 });
