@@ -93,13 +93,12 @@ public class ChatService {
             ObjectMapper mapper = new ObjectMapper();
             String messagesJson = mapper.writeValueAsString(conversationHistory);
 
-            String requestJson = """
-            {
-              "model": "mistral-medium",
-              "messages": %s,
-              "temperature": 0.8
-            }
-            """.formatted(messagesJson);
+            String requestJson = String.format(
+                    "{\n" +
+                            "  \"model\": \"mistral-medium\",\n" +
+                            "  \"messages\": %s,\n" +
+                            "  \"temperature\": 0.8\n" +
+                            "}", messagesJson);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
