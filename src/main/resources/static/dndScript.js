@@ -221,7 +221,7 @@ function updateOptionsFromResponse(choices) {
 
 function updateBackgroundFromMessage(message) {
     const trimmed = message.trim();
-    const match = trimmed.match(/#(tavern|castle|cave|alley|forest)\b/i);
+    const match = trimmed.match(/#(tavern|castle|cave|alley|forest|inn|market|shop|blacksmith|dungeon|ruins|plains|clearing|lake|altar)\b/i);
     if (!match) {
         console.log("🚫 No valid background tag found.");
         return;
