@@ -10,18 +10,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ChatService {
 
     private final String API_URL = "https://api.mistral.ai/v1/chat/completions";
-    private final String API_KEY = System.getenv("API_KEY");
     private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
-    private List<Map<String, String>> conversationHistory = new ArrayList<>();
+
+    // Store conversation histories per session
+    private final Map<String, List<Map<String, String>>> sessionHistories = new ConcurrentHashMap<>();
 
     private String determineScene(String message) {
         message = message.toLowerCase();
@@ -43,9 +45,28 @@ public class ChatService {
         return "default";
     }
 
-
-    public ChatResponse generateAdventureScenario(String userMessage) {
+    /**
+     * Generate adventure scenario using provided API key
+     * @param userMessage The user's message/action
+     * @param apiKey The Mistral API key provided by the user
+     * @param sessionId Unique session identifier for maintaining conversation history
+     * @return ChatResponse containing the DM's response
+     */
+    public ChatResponse generateAdventureScenario(String userMessage, String apiKey, String sessionId) {
         try {
+            // Validate API key
+            if (apiKey == null || apiKey.trim().isEmpty()) {
+                logger.error("No API key provided");
+                return new ChatResponse("⚠️ No API key provided. Please provide a valid Mistral API key.", 0, "❓ Unknown");
+            }
+
+            // Get or create conversation history for this session
+            List<Map<String, String>> conversationHistory = sessionHistories.computeIfAbsent(
+                    sessionId,
+                    k -> new ArrayList<>()
+            );
+
+            // Initialize system message if this is a new conversation
             if (conversationHistory.isEmpty()) {
                 conversationHistory.add(Map.of("role", "system", "content",
                         "You are a Dungeon Master guiding a player through a fantasy world. Speak like a wise, mystical wizard — poetic, but to the point. The story usually starts in a tavern or a small town where the player needs to begin quests. The world should feel alive, reactive, and sometimes dangerous. Present numbered choices (1, 2, 3, and 4), but only as many as make sense for the moment — sometimes 1, 2, or 3; never more than 4. Keep the choices at a reasonable length, so the player can make a choice relatively fast. Choices should feel decisive and impactful, with clear consequences (good or bad), but never provide any direct hint or guidance about the outcome. Avoid providing any explanations about what the choice means or how it affects the story." +
@@ -102,7 +123,7 @@ public class ChatService {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + API_KEY);
+            headers.set("Authorization", "Bearer " + apiKey);
 
             HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
             RestTemplate restTemplate = new RestTemplate();
@@ -121,8 +142,34 @@ public class ChatService {
             return new ChatResponse(finalMessage, dice, diceResult);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ChatResponse("⚠️ Noget gik galt. Prøv igen.", 0, "❓ Unknown");
+            logger.error("Error in generateAdventureScenario", e);
+            String errorMsg = e.getMessage();
+
+            // Provide more helpful error messages
+            if (errorMsg != null && errorMsg.contains("401")) {
+                return new ChatResponse("⚠️ Invalid API key. Please check your Mistral API key and try again.", 0, "❓ Unknown");
+            } else if (errorMsg != null && errorMsg.contains("429")) {
+                return new ChatResponse("⚠️ Rate limit exceeded. Please wait a moment and try again.", 0, "❓ Unknown");
+            }
+
+            return new ChatResponse("⚠️ Something went wrong. Please try again. Error: " + errorMsg, 0, "❓ Unknown");
         }
+    }
+
+    /**
+     * Clear conversation history for a session
+     * @param sessionId The session to clear
+     */
+    public void clearSession(String sessionId) {
+        sessionHistories.remove(sessionId);
+        logger.info("Cleared session: {}", sessionId);
+    }
+
+    /**
+     * Get the number of active sessions
+     * @return Number of active sessions
+     */
+    public int getActiveSessionCount() {
+        return sessionHistories.size();
     }
 }

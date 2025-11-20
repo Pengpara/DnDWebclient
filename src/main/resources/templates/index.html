@@ -70,12 +70,18 @@
             border: 2px solid #5c3c1d;
             box-shadow: inset 0 0 0 2px #2b1a0d, 0 0 0 4px #9b673a;
             transition: background-color 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
         }
 
-        .button:hover {
+        .button:hover:not(:disabled) {
             background-color: #9b673a;
             color: #000;
             transform: scale(1.05);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .dm-line {
@@ -155,11 +161,11 @@
             animation: blink 1.5s infinite;
         }
 
-         .dots::after {
-             content: '';
-             display: inline-block;
-             animation: dots 1s steps(3, end) infinite;
-         }
+        .dots::after {
+            content: '';
+            display: inline-block;
+            animation: dots 1s steps(3, end) infinite;
+        }
 
         @keyframes dots {
             0%   { content: ''; }
@@ -195,15 +201,182 @@
             opacity: 0;
         }
 
+        /* API Key Setup Modal Styles */
+        #api-key-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        #api-key-modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-box {
+            background-color: rgba(60, 44, 34, 0.5);
+            padding: 1rem;
+            font-size: 0.65rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .step {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .step::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #9b673a;
+        }
+
+        .link-button {
+            color: #00ff90;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .link-button:hover {
+            color: #00cc75;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.65rem;
+            margin-top: 0.5rem;
+        }
+
+        .success-message {
+            color: #00ff90;
+            font-size: 0.65rem;
+            margin-top: 0.5rem;
+        }
+
+        input[type="password"], input[type="text"] {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+        }
+
+        /* Scrollbar for modal */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #2b1a0d;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background-color: #9b673a;
+            border-radius: 4px;
+        }
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
-<!-- 🔹 Background layer for fade effect -->
+<!-- API Key Setup Modal -->
+<div id="api-key-modal">
+    <div class="modal-content w-full max-w-2xl pixel-border bg-[#1e1e1e] p-6 space-y-4 m-4">
+        <div class="text-center">
+            <h1 class="text-xl mb-3">⚔️ D&D Chat Adventure ⚔️</h1>
+            <p class="text-xs text-gray-400">Setup Your API Key</p>
+        </div>
+
+        <div class="info-box pixel-border">
+            <h2 class="text-sm mb-2 text-[#00ff90]">📜 Before You Begin</h2>
+            <p class="mb-2">
+                This demo uses the Mistral AI API to power your dungeon master. You'll need your own (free) API key to play.
+            </p>
+            <p class="text-[#facc15]">
+                Don't worry! It's quick and free to get started.
+            </p>
+        </div>
+
+        <div class="info-box pixel-border">
+            <h2 class="text-sm mb-2 text-[#00ff90]">🗝️ How to Get Your API Key:</h2>
+            <div class="space-y-1 text-[0.65rem]">
+                <div class="step">Go to <a href="https://console.mistral.ai/" target="_blank" class="link-button">console.mistral.ai</a></div>
+                <div class="step">Create a free account (if you don't have one)</div>
+                <div class="step">Navigate to "API Keys" in the sidebar</div>
+                <div class="step">Click "Create new key"</div>
+                <div class="step">Copy your API key and paste it below</div>
+            </div>
+            <div class="mt-2 text-[0.6rem] text-gray-400">
+                * Your key is stored only in your browser and never sent to my server
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <div>
+                <label for="api-key-input" class="block text-xs mb-2">Enter Your Mistral API Key:</label>
+                <input
+                        type="password"
+                        id="api-key-input"
+                        class="w-full bg-[#3c2c22] text-xs p-3 pixel-border text-[#e0d6b8]"
+                        placeholder="Enter your API key here..."
+                />
+                <div class="flex items-center gap-2 mt-2">
+                    <input type="checkbox" id="show-key-checkbox" class="cursor-pointer">
+                    <label for="show-key-checkbox" class="text-[0.65rem] cursor-pointer">Show API Key</label>
+                </div>
+            </div>
+
+            <div id="modal-error-message" class="error-message hidden"></div>
+            <div id="modal-success-message" class="success-message hidden"></div>
+
+            <div class="flex gap-3 justify-center flex-wrap">
+                <button id="start-game-button" class="button">
+                    🎮 Start Adventure
+                </button>
+                <button id="demo-mode-button" class="button" title="Try without API key (limited functionality)">
+                    👁️ Demo Mode
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center text-[0.6rem] text-gray-500 mt-3">
+            <p>Need help? Check the <a href="https://docs.mistral.ai/" target="_blank" class="link-button">Mistral AI Documentation</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Background layer for fade effect -->
 <div id="background-layer" class="absolute inset-0 -z-10" style="background-image: url('/cave.gif');"></div>
 
-<!-- 🔸 Chat UI -->
-<div class="w-full max-w-4xl relative pixel-border bg-[#1e1e1e]/80 p-4 space-y-4">
+<!-- Chat UI (hidden until API key is set) -->
+<div id="game-container" class="w-full max-w-4xl relative pixel-border bg-[#1e1e1e]/80 p-4 space-y-4 hidden">
     <div class="text-center mb-2">
         <h1 class="text-lg">D&D Chat Adventure</h1>
     </div>
