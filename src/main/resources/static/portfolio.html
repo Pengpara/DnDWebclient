@@ -265,19 +265,6 @@
             box-shadow: 0 6px 20px rgba(94, 156, 255, 0.6);
         }
 
-        .embedded-project {
-            margin-top: 30px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .embedded-project iframe {
-            width: 100%;
-            height: 600px;
-            border: none;
-        }
-
         footer {
             text-align: center;
             padding: 40px 20px;
@@ -330,25 +317,24 @@
     <header>
         <h1>Viktor Lærkes</h1>
         <p>Datamatiker studerende</p>
-        <p class="subtitle"></p>
+        <p class="subtitle">Den varmeste</p>
     </header>
 
     <section class="projects-section">
         <h2 class="section-title">Mine Projekter</h2>
         <div class="projects-grid" id="projectsGrid">
-            <!-- Projects will be dynamically added here -->
+            <!-- add projects here -->
         </div>
     </section>
 
-    <!-- Detail sections for each project -->
+
     <div id="projectDetails"></div>
 
     <footer>
-        <p>&copy; </p>
+        <p>&copy; 2024 Viktor Lærkes</p>
         <p>
-            <a href="https://github.com/yourusername" target="_blank">GitHub</a> |
-            <a href="https://linkedin.com/in/yourusername" target="_blank">LinkedIn</a> |
-            <a href="mailto:your.email@example.com">Email</a>
+            <a href="https://github.com/Pengpara" target="_blank">GitHub</a> |
+            <a href="mailto:vlaerkes@gmail.com">Email</a>
         </p>
     </footer>
 </div>
@@ -358,31 +344,31 @@
         {
             id: 'dnd-webclient',
             title: 'D&D Web Client',
-            image: 'https://via.placeholder.com/400x400/5e9cff/ffffff?text=D%26D+Client', // Replace with your actual screenshot
-            description: 'An interactive Dungeons & Dragons web client for managing campaigns, characters, and game sessions.',
-            techStack: ['HTML', 'CSS', 'JavaScript', 'Node.js'],
-            liveUrl: 'https://github.com/Pengpara/DnDWebclient',
-            isEmbedded: true,
-            embedUrl: './dnd-app/index.html' // Update this path to your actual DnD app entry point
-        }
-        // Add more projects below using the same format:
-        // {
-        //     id: 'project-name',
-        //     title: 'Project Title',
-        //     image: 'path/to/screenshot.jpg',
-        //     description: 'Project description here',
-        //     techStack: ['Tech1', 'Tech2', 'Tech3'],
-        //     liveUrl: 'https://your-project-url.com',
-        //     isEmbedded: false
-        // }
+            image: '/dndChatAdventure.png',
+            description: 'En AI dreven D&D web client. Bygget med Java, Spring Boot og JavaScript. Dynamisk storytelling, tærningekast og atmosfæretransitions. Work in Progress da meget funktionalitet mangler, som fx: Fate points/hit Points, Combat system, Inventory, Item usage',
+            techStack: ['Java', 'Spring Boot', 'JavaScript', 'HTML/CSS', 'Mistral AI API'],
+            liveUrl: '/dnd.html',
+            githubUrl: 'https://github.com/Pengpara/DnDWebclient',
+            isEmbedded: false  //
+        },
+        {
+            id: 'BloodBowl.dk',
+            title: 'BloodBowl.dk',
+            image: '/dndChatAdventure.png',
+            description: 'Dette var en reel opgave fra foreningen BloodBowl Danmark, og opgaven blev også brugt som eksamensprojekt. BloodBowl Danmark ønskede for det første, at deres hjemmeside fik et "ansigtsløft", og derudover var der nogle krav til funktionalitet på hjemmesiden. De ønskede en oversigt over alle spilleres placering i foreningen i relation til hinanden, som skulle løbende opdateres**,** hver gang der blev spillet turneringer. I den forbindelse skulle der laves et system**,** der kunne læse .csv- og .bbd-filer og opdatere leaderboardets data ved upload af disse filer. Vi nåede ikke at blive færdige med opgaven grundet tidsbegrænsninger, men Blood Bowl Danmark har fået adgang til vores arbejde. I øjeblikket kan webappen læse .csv-filer, og dataen dukker korrekt op i databasen, men der sker en fejl i visningen af dataen.',
+            techStack: ['Java', 'Spring Boot', 'JavaScript', 'HTML/CSS'],
+            liveUrl: '',
+            githubUrl: 'https://github.com/Pengpara/DnDWebclient',
+            isEmbedded: false  //
+        },
+
     ];
 
-    // Generate project circles
+
     const projectsGrid = document.getElementById('projectsGrid');
     const projectDetailsContainer = document.getElementById('projectDetails');
 
     projects.forEach(project => {
-        // Create circle element
         const circle = document.createElement('div');
         circle.className = 'project-circle';
         circle.innerHTML = `
@@ -397,7 +383,6 @@
         circle.addEventListener('click', () => showProject(project.id));
         projectsGrid.appendChild(circle);
 
-        // Create detail section
         const detailSection = document.createElement('div');
         detailSection.className = 'detail-section';
         detailSection.id = `detail-${project.id}`;
@@ -412,28 +397,23 @@
                     <div class="tech-stack">
                         ${project.techStack.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
                     </div>
-                    ${project.liveUrl !== '#' ? `<a href="${project.liveUrl}" target="_blank" class="project-link">View Project</a>` : ''}
-                    ${project.isEmbedded ? `
-                        <div class="embedded-project">
-                            <iframe src="${project.embedUrl}" title="${project.title}"></iframe>
-                        </div>
-                    ` : ''}
+                    <div style="margin-top: 25px;">
+                        ${project.liveUrl ? `<a href="${project.liveUrl}" class="project-link">Launch Project →</a>` : ''}
+                        ${project.githubUrl ? `<a href="${project.githubUrl}" target="_blank" class="project-link" style="margin-left: 10px;">View on GitHub →</a>` : ''}
+                    </div>
                 </div>
             `;
         projectDetailsContainer.appendChild(detailSection);
     });
 
     function showProject(projectId) {
-        // Hide all detail sections
         document.querySelectorAll('.detail-section').forEach(section => {
             section.classList.remove('active');
         });
 
-        // Show selected project
         const detailSection = document.getElementById(`detail-${projectId}`);
         detailSection.classList.add('active');
 
-        // Smooth scroll to detail section
         detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -441,7 +421,6 @@
         const detailSection = document.getElementById(`detail-${projectId}`);
         detailSection.classList.remove('active');
 
-        // Scroll back to projects grid
         document.querySelector('.projects-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 </script>

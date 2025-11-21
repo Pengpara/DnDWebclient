@@ -149,7 +149,6 @@
             border: 2px solid #2b1a0d;
         }
 
-        /* Blinking Thinking... */
         @keyframes blink {
             0% { opacity: 0.2; }
             50% { opacity: 1; }
@@ -173,17 +172,15 @@
             66%  { content: '..'; }
             100% { content: '...'; }
         }
-        /* Base filter transition */
+
         body {
             transition: filter 2s ease-in-out;
         }
 
-        /* Fade everything to black */
         body.fade-to-black {
             filter: brightness(0);
         }
 
-        /* Fade everything back to normal */
         body.fade-to-normal {
             filter: brightness(1);
         }
@@ -196,12 +193,10 @@
             transition: opacity 2s ease-in-out;
         }
 
-        /* Fading class */
         #background-layer.fade-out {
             opacity: 0;
         }
 
-        /* API Key Setup Modal Styles */
         #api-key-modal {
             position: fixed;
             top: 0;
@@ -287,7 +282,6 @@
             font-size: 0.75rem;
         }
 
-        /* Scrollbar for modal */
         .modal-content::-webkit-scrollbar {
             width: 8px;
         }
@@ -301,7 +295,6 @@
             background-color: #9b673a;
             border-radius: 4px;
         }
-
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -363,6 +356,9 @@
                 <button id="demo-mode-button" class="button" title="Try without API key (limited functionality)">
                     👁️ Demo Mode
                 </button>
+                <a href="/static" class="button inline-block">
+                    ← Back to Portfolio
+                </a>
             </div>
         </div>
 
@@ -392,6 +388,6 @@
     </div>
 </div>
 
-<script src="dndScript.js"></script>
+<script src="/js/dndScript.js"></script>
 </body>
 </html>
