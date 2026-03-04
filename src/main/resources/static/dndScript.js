@@ -2,6 +2,7 @@ let characterCreated = false;
 let characterInfo = {};
 let currentChoices = [];
 let currentBackground = 'cave'; // Default initial background
+let fatePoints = 3;
 
 const dmThinkingLines = [
     "The DM strokes his long, silver beard, eyes flickering like candlelight in deep thought",
@@ -38,6 +39,107 @@ const dmThinkingLines = [
 
 function getRandomDmThinkingLine() {
     return dmThinkingLines[Math.floor(Math.random() * dmThinkingLines.length)];
+}
+
+function updateFateHud(points) {
+    fatePoints = points;
+    for (let i = 0; i < 3; i++) {
+        const icon = document.getElementById(`fate-${i}`);
+        if (icon) {
+            icon.classList.toggle('spent', i >= points);
+        }
+    }
+}
+
+function showFateChoice() {
+    const optionsContainer = document.getElementById('options-container');
+    optionsContainer.innerHTML = '';
+
+    const spendBtn = document.createElement('button');
+    spendBtn.classList.add('button');
+    spendBtn.textContent = `✦ Spend a fate point (${fatePoints} remaining)`;
+    spendBtn.onclick = () => handleFatePointSpend();
+    optionsContainer.appendChild(spendBtn);
+
+    const acceptBtn = document.createElement('button');
+    acceptBtn.classList.add('button');
+    acceptBtn.style.borderColor = '#7f1d1d';
+    acceptBtn.textContent = '☠ Accept your fate';
+    acceptBtn.onclick = () => handleAcceptDeath();
+    optionsContainer.appendChild(acceptBtn);
+}
+
+async function handleFatePointSpend() {
+    document.getElementById('options-container').innerHTML = '';
+    showThinking();
+
+    const response = await fetch('http://localhost:8080/chat/adventure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spendFatePoint: true })
+    });
+    removeThinking();
+
+    if (response.ok) {
+        const data = await response.json();
+        updateFateHud(data.fatePoints);
+        updateBackgroundFromMessage(data.message);
+
+        const cleanedMessage = data.message
+            .split('\n')
+            .filter(line => !/^\d+\.\s/.test(line))
+            .join('\n');
+
+        await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
+        const choices = extractChoicesFromMessage(data.message);
+        currentChoices = choices;
+        updateOptionsFromResponse(choices);
+    } else {
+        appendToGameLog("⚠️ Error spending fate point.", true);
+    }
+}
+
+async function handleAcceptDeath() {
+    document.getElementById('options-container').innerHTML = '';
+    showThinking();
+
+    await fetch('http://localhost:8080/chat/adventure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ acceptDeath: true })
+    });
+    removeThinking();
+
+    showGameOver();
+}
+
+function showGameOver() {
+    const optionsContainer = document.getElementById('options-container');
+    optionsContainer.innerHTML = '';
+
+    appendToGameLog("💀 Your story ends here, brave adventurer.", true, false);
+
+    const newGameBtn = document.createElement('button');
+    newGameBtn.classList.add('button');
+    newGameBtn.textContent = '⚔ Begin a new adventure';
+    newGameBtn.onclick = () => restartGame();
+    optionsContainer.appendChild(newGameBtn);
+}
+
+async function restartGame() {
+    await fetch('http://localhost:8080/chat/reset', { method: 'POST' });
+
+    document.getElementById('game-log').innerHTML = '';
+    document.getElementById('options-container').innerHTML = '';
+    document.getElementById('input-container').style.display = 'flex';
+    updateFateHud(3);
+
+    characterCreated = false;
+    characterInfo = {};
+    currentChoices = [];
+
+    appendToGameLog("🧙‍♂️ Ohh, hello traveller! Let's begin thy journey...", true);
+    createCharacter();
 }
 
 async function appendToGameLog(text, isDM = false, useTyping = true) {
@@ -171,8 +273,9 @@ async function startAdventure() {
 
     if (response.ok) {
         const data = await response.json();
-        console.log("✅ Received message:", data.message); // <-- ADD THIS
+        console.log("✅ Received message:", data.message);
 
+        updateFateHud(data.fatePoints);
         updateBackgroundFromMessage(data.message);
 
         const cleanedMessage = data.message
@@ -182,10 +285,19 @@ async function startAdventure() {
 
         await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
 
-        const choices = extractChoicesFromMessage(data.message);
+        if (data.gameOver) {
+            showGameOver();
+            return;
+        }
 
+        const choices = extractChoicesFromMessage(data.message);
         currentChoices = choices;
-        updateOptionsFromResponse(choices);
+
+        if (data.requiresFatePoint) {
+            showFateChoice();
+        } else {
+            updateOptionsFromResponse(choices);
+        }
     } else {
         appendToGameLog("⚠️ Error: Could not retrieve adventure.", true);
     }
@@ -283,8 +395,9 @@ async function handleUserChoice(choiceIndex, choiceText) {
 
     if (response.ok) {
         const data = await response.json();
-        console.log("✅ Received message:", data.message); // <-- ADD THIS
+        console.log("✅ Received message:", data.message);
 
+        updateFateHud(data.fatePoints);
         updateBackgroundFromMessage(data.message);
 
         const cleanedMessage = data.message
@@ -292,10 +405,21 @@ async function handleUserChoice(choiceIndex, choiceText) {
             .filter(line => !/^\d+\.\s/.test(line))
             .join('\n');
 
-        await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true); // 🧙‍♂️ skal have typewriter-effekt
+        await appendToGameLog(`🧙‍♂️ ${cleanedMessage}`, true);
+
+        if (data.gameOver) {
+            showGameOver();
+            return;
+        }
+
         const choices = extractChoicesFromMessage(data.message);
         currentChoices = choices;
-        updateOptionsFromResponse(choices);
+
+        if (data.requiresFatePoint) {
+            showFateChoice();
+        } else {
+            updateOptionsFromResponse(choices);
+        }
     } else {
         appendToGameLog("⚠️ Error: Could not retrieve next part of adventure.", true);
     }
