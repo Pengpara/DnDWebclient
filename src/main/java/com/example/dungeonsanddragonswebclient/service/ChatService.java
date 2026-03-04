@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @Service
 public class ChatService {
@@ -38,23 +40,40 @@ public class ChatService {
         fatePoints = 3;
     }
 
-    private String determineScene(String message) {
-        message = message.toLowerCase();
-        if (message.contains("tavern")) return "tavern";
-        if (message.contains("castle")) return "castle";
-        if (message.contains("cave")) return "cave";
-        if (message.contains("alley")) return "alley";
-        if (message.contains("forest")) return "forest";
-        if (message.contains("inn")) return "Tavern";
-        if (message.contains("market")) return "Market";
-        if (message.contains("shop")) return "Market";
-        if (message.contains("blacksmith")) return "blacksmith";
-        if (message.contains("dungeon")) return "dungeon";
-        if (message.contains("ruins")) return "ruins";
-        if (message.contains("plains")) return "plains";
-        if (message.contains("clearing")) return "clearing";
-        if (message.contains("lake")) return "lake";
-        if (message.contains("altar")) return "altar";
+    private static final List<Map.Entry<String, List<Pattern>>> SCENE_PATTERNS;
+    static {
+        Map<String, List<String>> synonyms = new LinkedHashMap<>();
+        synonyms.put("tavern",     List.of("tavern", "inn", "pub", "alehouse", "taproom"));
+        synonyms.put("blacksmith", List.of("blacksmith", "forge", "smithy", "anvil"));
+        synonyms.put("altar",      List.of("altar", "shrine", "temple", "chapel", "sanctuary"));
+        synonyms.put("alley",      List.of("alley", "alleyway"));
+        synonyms.put("dungeon",    List.of("dungeon", "prison", "cell", "crypt", "tomb", "catacomb"));
+        synonyms.put("castle",     List.of("castle", "fortress", "citadel", "keep", "stronghold", "battlements", "tower"));
+        synonyms.put("cave",       List.of("cave", "cavern", "grotto", "tunnel"));
+        synonyms.put("forest",     List.of("forest", "woods", "woodland", "grove", "thicket", "wilderness"));
+        synonyms.put("ruins",      List.of("ruins", "rubble", "remnants", "abandoned"));
+        synonyms.put("clearing",   List.of("clearing", "glade"));
+        synonyms.put("plains",     List.of("plains", "fields", "meadow", "grassland", "heath", "moor"));
+        synonyms.put("lake",       List.of("lake", "river", "pond", "stream", "shore", "bay", "coast"));
+        SCENE_PATTERNS = synonyms.entrySet().stream()
+            .map(e -> Map.entry(
+                e.getKey(),
+                e.getValue().stream()
+                    .map(kw -> Pattern.compile("\\b" + kw + "\\b"))
+                    .toList()
+            ))
+            .toList();
+    }
+
+    String determineScene(String message) {
+        String lower = message.toLowerCase();
+        for (var entry : SCENE_PATTERNS) {
+            for (Pattern p : entry.getValue()) {
+                if (p.matcher(lower).find()) {
+                    return entry.getKey();
+                }
+            }
+        }
         return "default";
     }
 

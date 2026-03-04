@@ -118,4 +118,51 @@ class ChatServiceTest {
         chatService.reset();
         assertEquals(3, chatService.getFatePoints());
     }
+
+    // ── determineScene tests ──────────────────────────────────────────────────
+
+    @Test
+    void determineScene_wordBoundary_innDoesNotMatchBeginning() {
+        assertEquals("default", chatService.determineScene("In the beginning there was darkness."));
+    }
+
+    @Test
+    void determineScene_synonym_woodlandMapsToForest() {
+        assertEquals("forest", chatService.determineScene("You step into the ancient woodland."));
+    }
+
+    @Test
+    void determineScene_synonym_cryptMapsToDungeon() {
+        assertEquals("dungeon", chatService.determineScene("The crypt doors creak open before you."));
+    }
+
+    @Test
+    void determineScene_synonym_forgeMapsToBlacksmith() {
+        assertEquals("blacksmith", chatService.determineScene("Sparks fly from the forge."));
+    }
+
+    @Test
+    void determineScene_synonym_meadowMapsToPlains() {
+        assertEquals("plains", chatService.determineScene("A wide meadow stretches before you."));
+    }
+
+    @Test
+    void determineScene_synonym_pubMapsToTavern() {
+        assertEquals("tavern", chatService.determineScene("The rowdy pub is full of patrons."));
+    }
+
+    @Test
+    void determineScene_specificBeforeGeneral_forgeInDungeonMapsToBlacksmith() {
+        assertEquals("blacksmith", chatService.determineScene("A forge glows inside the dungeon."));
+    }
+
+    @Test
+    void determineScene_noMatch_returnsDefault() {
+        assertEquals("default", chatService.determineScene("You stand in an unknown place."));
+    }
+
+    @Test
+    void determineScene_inn_mapsToTavernLowercase() {
+        assertEquals("tavern", chatService.determineScene("The inn is warm and inviting."));
+    }
 }
