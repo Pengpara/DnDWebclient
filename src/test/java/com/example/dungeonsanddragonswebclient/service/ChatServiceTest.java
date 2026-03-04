@@ -165,4 +165,31 @@ class ChatServiceTest {
     void determineScene_inn_mapsToTavernLowercase() {
         assertEquals("tavern", chatService.determineScene("The inn is warm and inviting."));
     }
+
+    // ── extractSceneTag tests ─────────────────────────────────────────────────
+
+    @Test
+    void extractSceneTag_validTag_returnsScene() {
+        assertEquals("forest", chatService.extractSceneTag("You enter the woods. #forest"));
+    }
+
+    @Test
+    void extractSceneTag_tagWithDeathAfter_returnsScene() {
+        assertEquals("dungeon", chatService.extractSceneTag("You are slain. #dungeon #death"));
+    }
+
+    @Test
+    void extractSceneTag_noTag_returnsNull() {
+        assertNull(chatService.extractSceneTag("You stand in the dark."));
+    }
+
+    @Test
+    void extractSceneTag_invalidTag_returnsNull() {
+        assertNull(chatService.extractSceneTag("You browse the market. #market"));
+    }
+
+    @Test
+    void extractSceneTag_caseInsensitive_returnsLowercase() {
+        assertEquals("tavern", chatService.extractSceneTag("Welcome! #TAVERN"));
+    }
 }

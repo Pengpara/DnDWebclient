@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -63,6 +64,16 @@ public class ChatService {
                     .toList()
             ))
             .toList();
+    }
+
+    private static final Pattern SCENE_TAG_PATTERN = Pattern.compile(
+        "#(tavern|castle|cave|forest|dungeon|ruins|plains|clearing|lake|blacksmith|altar|alley)\\b",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    String extractSceneTag(String message) {
+        Matcher m = SCENE_TAG_PATTERN.matcher(message);
+        return m.find() ? m.group(1).toLowerCase() : null;
     }
 
     String determineScene(String message) {
