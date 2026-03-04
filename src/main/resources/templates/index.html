@@ -195,6 +195,22 @@
             opacity: 0;
         }
 
+        #fate-hud {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #facc15;
+            letter-spacing: 0.1em;
+            padding: 4px 0;
+        }
+        .fate-icon {
+            display: inline-block;
+            margin: 0 3px;
+            transition: opacity 0.4s ease;
+        }
+        .fate-icon.spent {
+            opacity: 0.25;
+        }
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -206,6 +222,13 @@
 <div class="w-full max-w-4xl relative pixel-border bg-[#1e1e1e]/80 p-4 space-y-4">
     <div class="text-center mb-2">
         <h1 class="text-lg">D&D Chat Adventure</h1>
+    </div>
+
+    <div id="fate-hud">
+        <span>Fate Points:</span>
+        <span class="fate-icon" id="fate-0">✦</span>
+        <span class="fate-icon" id="fate-1">✦</span>
+        <span class="fate-icon" id="fate-2">✦</span>
     </div>
 
     <div id="game-log" class="h-96 overflow-y-auto bg-black p-3 text-green-400 text-xs font-mono space-y-2"></div>
