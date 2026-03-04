@@ -117,7 +117,11 @@ public class ChatService {
         "2. **Exclude dice roll information** from player choices, and do not tell the player that a dice roll is used in any way." +
         "3. When the player faces a certain fatal outcome — mortal wounds, lethal trap, or overwhelming defeat with no possible escape — append exactly '#death' at the very end of your response, after all scene tags. Use #death ONLY for genuinely fatal outcomes, not merely dangerous situations." +
         "4. When the player message is exactly 'I spend a fate point to escape death.', narrate their miraculous narrow escape (waking in a tavern, saved by a wandering traveler, etc.). Do not present numbered choices — only the escape narrative. End with a scene tag." +
-        "5. When the player message is exactly 'I accept my fate.', write a final poetic death narrative for this character. No numbered choices. This is the end of their story.";
+        "5. When the player message is exactly 'I accept my fate.', write a final poetic death narrative for this character. No numbered choices. This is the end of their story." +
+        "6. At the end of every response, append exactly one scene tag from this list: " +
+        "#tavern #castle #cave #forest #dungeon #ruins #plains #clearing #lake #blacksmith #altar #alley. " +
+        "Choose the tag that best reflects where the scene is currently taking place. " +
+        "Always include it — even if the location has not changed. Place it after #death if applicable.";
 
     public ChatResponse generateAdventureScenario(ChatRequest request) {
         try {
@@ -173,9 +177,15 @@ public class ChatService {
                 botMessage = botMessage.replace("#death", "").trim();
             }
 
-            conversationHistory.add(Map.of("role", "assistant", "content", botMessage));
+            // AI tag takes priority; fall back to keyword matching
+            String sceneHint = extractSceneTag(botMessage);
+            if (sceneHint != null) {
+                botMessage = SCENE_TAG_PATTERN.matcher(botMessage).replaceAll("").trim();
+            } else {
+                sceneHint = determineScene(botMessage);
+            }
 
-            String sceneHint = determineScene(botMessage);
+            conversationHistory.add(Map.of("role", "assistant", "content", botMessage));
             String finalMessage = shouldRoll
                     ? "🎲 You rolled a **%d** — %s\n\n%s\n\n#%s".formatted(dice, diceResult, botMessage, sceneHint)
                     : botMessage + "\n\n#" + sceneHint;
