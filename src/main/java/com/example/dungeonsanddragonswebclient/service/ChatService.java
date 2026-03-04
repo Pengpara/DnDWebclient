@@ -121,7 +121,7 @@ public class ChatService {
         "6. At the end of every response, append exactly one scene tag from this list: " +
         "#tavern #castle #cave #forest #dungeon #ruins #plains #clearing #lake #blacksmith #altar #alley. " +
         "Choose the tag that best reflects where the scene is currently taking place. " +
-        "Always include it — even if the location has not changed. Place it after #death if applicable.";
+        "Always include it — even if the location has not changed. Place it before #death if applicable.";
 
     public ChatResponse generateAdventureScenario(ChatRequest request) {
         try {
