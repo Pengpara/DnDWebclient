@@ -4,6 +4,9 @@ public class ChatResponse {
     private String message;
     private int diceRoll;
     private String diceResult;
+    private int fatePoints = 3;
+    private boolean requiresFatePoint = false;
+    private boolean gameOver = false;
 
     public ChatResponse() {}
 
@@ -13,27 +16,21 @@ public class ChatResponse {
         this.diceResult = diceResult;
     }
 
-    public String getMessage() {
-        return message;
-    }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    public int getDiceRoll() { return diceRoll; }
+    public void setDiceRoll(int diceRoll) { this.diceRoll = diceRoll; }
 
-    public int getDiceRoll() {
-        return diceRoll;
-    }
+    public String getDiceResult() { return diceResult; }
+    public void setDiceResult(String diceResult) { this.diceResult = diceResult; }
 
-    public void setDiceRoll(int diceRoll) {
-        this.diceRoll = diceRoll;
-    }
+    public int getFatePoints() { return fatePoints; }
+    public void setFatePoints(int fatePoints) { this.fatePoints = fatePoints; }
 
-    public String getDiceResult() {
-        return diceResult;
-    }
+    public boolean isRequiresFatePoint() { return requiresFatePoint; }
+    public void setRequiresFatePoint(boolean requiresFatePoint) { this.requiresFatePoint = requiresFatePoint; }
 
-    public void setDiceResult(String diceResult) {
-        this.diceResult = diceResult;
-    }
+    public boolean isGameOver() { return gameOver; }
+    public void setGameOver(boolean gameOver) { this.gameOver = gameOver; }
 }
