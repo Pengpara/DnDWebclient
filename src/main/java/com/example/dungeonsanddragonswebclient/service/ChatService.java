@@ -21,7 +21,12 @@ public class ChatService {
     private final String API_URL = "https://api.mistral.ai/v1/chat/completions";
     private final String API_KEY = System.getenv("API_KEY");
     private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
+    private final RestTemplate restTemplate;
     private List<Map<String, String>> conversationHistory = new ArrayList<>();
+
+    public ChatService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     private String determineScene(String message) {
         message = message.toLowerCase();
@@ -105,8 +110,6 @@ public class ChatService {
             headers.set("Authorization", "Bearer " + API_KEY);
 
             HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
-            RestTemplate restTemplate = new RestTemplate();
-
             ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
             JsonNode root = mapper.readTree(response.getBody());
             String botMessage = root.path("choices").get(0).path("message").path("content").asText();
